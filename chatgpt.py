@@ -10,13 +10,18 @@ from playwright.sync_api import sync_playwright
 class OpenAIChat:
 
     def __init__(self):
+        # Create a Playwright instance
         self.PLAY = sync_playwright().start()
+        # Create a persistent browser context
         self.BROWSER = self.PLAY.firefox.launch_persistent_context(
             user_data_dir="/tmp/playwright",
             headless=False,
         )
+        # Create a new page
         self.PAGE = self.BROWSER.new_page()
+        # Navigate to the OpenAI chatbot page
         self.PAGE.goto("https://chat.openai.com/")
+        # Check if the user is logged in
         if not self.is_logged_in():
             print("Please log in to OpenAI Chat")
             print("Press enter when you're done")
@@ -64,24 +69,37 @@ class OpenAIChat:
         return self.PAGE.query_selector("a:has-text('Reset thread')")
 
     def chat(self, message):
+        # Print the message that is being sent
         print("Sending message: ", message)
+        # Send the message
         self.send_message(message)
+        # Get the response
         response = self.get_last_message()
+        # Print the response
         print("Response: ", response)
+        # Return the response
         return response
 
     def restart(self):
+        # Close the page and browser
         self.PAGE.close()
         self.BROWSER.close()
+        # Stop the Playwright instance
         self.PLAY.stop()
+        # Pause for a bit
         time.sleep(0.25)
+        # Start a new Playwright instance
         self.PLAY = sync_playwright().start()
+        # Create a new persistent browser context
         self.BROWSER = self.PLAY.chromium.launch_persistent_context(
             user_data_dir="/tmp/playwright",
             headless=False,
         )
+        # Create a new page
         self.PAGE = self.BROWSER.new_page()
+        # Navigate to the OpenAI chatbot page
         self.PAGE.goto("https://chat.openai.com/")
+        # Return a message
         return "API restart!"
 
 # Test it
