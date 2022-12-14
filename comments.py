@@ -5,12 +5,17 @@ class HackerNewsComments:
     # Set the base URL for the Hacker News API
     HACKER_NEWS_API_URL = 'https://hacker-news.firebaseio.com/v0'
 
-    def __init__(self, thread_id):
-        self.thread_id = thread_id
+    def __init__(self, max_comments):
+        self.max_comments = max_comments
 
-    def fetch_comments(self, indent=0):
+    def fetch_comments(self, comment_id, indent=0):
+        # only fetch up to max_comments
+        self.max_comments -= 1
+        if self.max_comments < 0:
+            return
+
         # Fetch the details of the thread from the API
-        thread_response = requests.get(f'{HACKER_NEWS_API_URL}/item/{self.thread_id}.json')
+        thread_response = requests.get(f'{HackerNewsComments.HACKER_NEWS_API_URL}/item/{comment_id}.json')
         thread = thread_response.json()
 
         # Print the text of the thread
@@ -25,5 +30,5 @@ class HackerNewsComments:
 
 # Fetch the comments for the thread with id 33961106
 # and print them in a hierarchical manner
-hn_comments = HackerNewsComments(33961106)
-hn_comments.fetch_comments()
+hn_comments = HackerNewsComments(5)
+hn_comments.fetch_comments(33961106)
